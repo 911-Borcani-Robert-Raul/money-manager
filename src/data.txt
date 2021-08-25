@@ -1,0 +1,5 @@
+Tether|USDT|790.14
+Elrond|EGLD|8.816
+Chainlink|LINK|25
+Cardano|ADA|1273.59
+Crypto.com coin|CRO|6579.8
