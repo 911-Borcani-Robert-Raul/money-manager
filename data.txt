@@ -1,0 +1,3 @@
+dolar|USD|10765
+Bitcoin|BTC|0.03
+leu|RON|25000

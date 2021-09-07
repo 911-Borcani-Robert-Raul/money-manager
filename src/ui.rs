@@ -31,6 +31,7 @@ impl<'a> Ui<'a> {
                 "2" => self.print_summary(),
                 "3" => self.buy_currency(),
                 "4" => self.sell_currency(),
+                "5" => self.remove_currency(),
                 _ => println!("Please enter a valid option!"),
             };
         }
@@ -45,6 +46,7 @@ impl<'a> Ui<'a> {
         println!("2. See summary");
         println!("3. Buy currency");
         println!("4. Sell currency");
+        println!("5. Remove currency");
     }
 
     fn add_currency(&mut self) {
@@ -112,6 +114,18 @@ impl<'a> Ui<'a> {
                 Err(error) => println!("Error: {}", error),
             },
             Err(_) => println!("Error! Please enter a valid number!"),
+        };
+
+        println!();
+    }
+
+    fn remove_currency(&mut self) {
+        println!("Enter the id of the currency you want to remove: ");
+        let id = Ui::read_currency_id();
+
+        match self.service.remove_currency(&id[..]) {
+            Ok(()) => (),
+            Err(error) => println!("Error: {}", error),
         };
 
         println!();

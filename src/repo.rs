@@ -4,6 +4,31 @@ use std::collections::hash_map;
 use std::fs::File;
 use std::io::{Write, BufReader, BufRead};
 use std::num::ParseFloatError;
+use std::fmt;
+
+#[derive(Debug, Clone)]
+pub struct RepoError {
+    message: String,
+}
+
+impl RepoError {
+    pub fn new(message: String) -> RepoError {
+        RepoError {
+            message,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn get_message(&self) -> String {
+        self.message.clone()
+    }
+}
+
+impl fmt::Display for RepoError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
 
 pub struct CurrencyRepo {
     currencies: HashMap<String, domain::CurrencyBalance>,
@@ -25,9 +50,9 @@ impl CurrencyRepo {
         repo
     }
 
-    pub fn add_currency(&mut self, currency: domain::Currency, amount: f64) -> Result<(), &str> {
+    pub fn add_currency(&mut self, currency: domain::Currency, amount: f64) -> Result<(), RepoError> {
         if self.currencies.contains_key(&currency.id) {
-            return Err("Currency with given ID already exists");
+            return Err(RepoError::new(String::from("Currency with given ID already exists")));
         }
 
         self.currencies.insert(currency.id.clone(), domain::CurrencyBalance::new(currency, amount));
@@ -38,6 +63,7 @@ impl CurrencyRepo {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn get_number_of_currencies(&self) -> usize {
         self.currencies.len()
     }
@@ -62,21 +88,34 @@ impl CurrencyRepo {
         };
     }
 
+    pub fn remove_currency(&mut self, id: &str) -> Result<(), RepoError> {
+        match self.currencies.remove(&String::from(id)) {
+            Some(_) => {
+                match self.write_data() {
+                    Ok(()) => (),
+                    Err(error) => eprintln!("{}", error.to_string()),
+                };
+                Ok(())
+            },
+            None => Err(RepoError::new(String::from("No such currency found!"))),
+        }
+    }
+
     pub fn iter(&self) -> hash_map::Values<'_, String, domain::CurrencyBalance> {
         self.currencies.values()
     }
 
-    fn read_data(&mut self) -> Result<(), String> {
+    fn read_data(&mut self) -> Result<(), RepoError> {
         let file = match File::open(&self.file_name[..]) {
             Ok(file) => file,
-            Err(error) => { return Err(error.to_string()); },
+            Err(error) => { return Err(RepoError::new(error.to_string())); },
         };
 
         let buffered = BufReader::new(file);
         for line in buffered.lines() {
             let current_line: String = match line {
                 Ok(line) => line,
-                Err(error) => { return Err(error.to_string()); },
+                Err(error) => { return Err(RepoError::new(error.to_string())); },
             };
             let items: Vec<&str> = current_line.split("|").collect();
 
@@ -88,7 +127,7 @@ impl CurrencyRepo {
                     let current_currency_balance = domain::CurrencyBalance::new(current_currency, amount);
                     self.currencies.insert(current_currency_balance.currency.id.clone(), current_currency_balance);
                 },
-                Err(error) => { return Err(error.to_string()); },
+                Err(error) => { return Err(RepoError::new(error.to_string())); },
             };
         }
 
