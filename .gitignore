@@ -1,1 +1,6 @@
 /target
+*.swp
+/src/main.exe
+/src/main.exe
+/src/main.pdb
+/src/tempCodeRunnerFile.rs

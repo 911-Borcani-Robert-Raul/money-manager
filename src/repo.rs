@@ -69,7 +69,7 @@ impl CurrencyRepo {
     }
 
     pub fn get_amount(&self, id: &str) -> Option<f64> {
-        let currency = self.currencies.get(&String::from(id));
+        let currency = self.currencies.get(id);
         match currency {
             Some(currency) => Some(currency.amount),
             None => None
@@ -77,7 +77,7 @@ impl CurrencyRepo {
     }
 
     pub fn modify_amount(&mut self, id: &str, new_amount: f64) {
-        let currency = self.currencies.get_mut(&String::from(id));
+        let currency = self.currencies.get_mut(id);
         match currency {
             Some(currency) => currency.amount = new_amount,
             None => ()
@@ -89,7 +89,7 @@ impl CurrencyRepo {
     }
 
     pub fn remove_currency(&mut self, id: &str) -> Result<(), RepoError> {
-        match self.currencies.remove(&String::from(id)) {
+        match self.currencies.remove(id) {
             Some(_) => {
                 match self.write_data() {
                     Ok(()) => (),
@@ -119,7 +119,7 @@ impl CurrencyRepo {
             };
             let items: Vec<&str> = current_line.split("|").collect();
 
-            let current_currency = domain::Currency::new(items[0], items[1]);
+            let current_currency = domain::Currency::new(String::from(items[0]), String::from(items[1]));
             let amount: Result<f64, ParseFloatError> = items[2].parse();
             
             match amount {

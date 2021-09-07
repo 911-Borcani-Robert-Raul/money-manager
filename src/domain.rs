@@ -4,10 +4,10 @@ pub struct Currency{
 }
 
 impl Currency{
-    pub fn new(name: &str, id: &str) -> Currency {
+    pub fn new(name: String, id: String) -> Currency {
         Currency {
-            name: String::from(name),
-            id: String::from(id),
+            name,
+            id,
         }
     }
 }

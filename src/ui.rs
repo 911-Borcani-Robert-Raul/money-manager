@@ -56,11 +56,11 @@ impl<'a> Ui<'a> {
         io::stdin()
             .read_line(&mut name)
             .expect("Failed to read input!");
-        let name = name.trim();
+        let name = String::from(name.trim());
         println!("Enter the id of the currency: ");
         let id = Ui::read_currency_id();
 
-        let currency = domain::Currency::new(&name[..], &id[..]);
+        let currency = domain::Currency::new(name, id);
         
         println!("Enter the initial amount: ");
         let amount: Result<f64, _> = Ui::read_currency_amount();
